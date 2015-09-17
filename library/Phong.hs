@@ -15,7 +15,7 @@ main = Gloss.play
     handleStep
 
 displayMode :: Gloss.Display
-displayMode = Gloss.FullScreen (1440, 900)
+displayMode = Gloss.FullScreen (worldWidth, worldHeight)
 
 backgroundColor :: Gloss.Color
 backgroundColor = Gloss.makeColor 0.5 0.5 0.5 0.0
@@ -49,9 +49,9 @@ handleStep time world =
         px' = px + time * vx
         py' = py + time * vy
 
-        vx' = if px' >= (720.0 - ballRadius) || px' <= (ballRadius - 720.0)
+        vx' = if px' >= (worldWidth / 2 - ballRadius) || px' <= (ballRadius - worldWidth / 2)
             then -vx else vx
-        vy' = if py' >= (450.0 - ballRadius) || py' <= (ballRadius - 450.0)
+        vy' = if py' >= (worldHeight / 2 - ballRadius) || py' <= (ballRadius - worldHeight / 2)
             then -vy else vy
     in  world
         { ballPosition = (px', py')
@@ -62,6 +62,12 @@ data World = World
     { ballPosition :: (Float, Float)
     , ballVelocity :: (Float, Float)
     } deriving (Eq, Ord, Read, Show)
+
+worldWidth :: (Num a) => a
+worldWidth = 1440
+
+worldHeight :: (Num a) => a
+worldHeight = 900
 
 ballRadius :: Float
 ballRadius = 10.0

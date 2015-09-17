@@ -1,5 +1,7 @@
 module Phong where
 
+import Flow
+
 import qualified Graphics.Gloss.Interface.Pure.Game as Gloss
 
 main :: IO ()
@@ -23,13 +25,14 @@ stepRate = 1
 
 initialWorld :: World
 initialWorld = World
-    {
+    { ballPosition = (0.0, 0.0)
     }
 
 renderWorld :: World -> Gloss.Picture
 renderWorld world = Gloss.pictures
     [ Gloss.text (show world)
     , Gloss.circle ballRadius
+        |> uncurry Gloss.translate (ballPosition world)
     ]
 
 handleEvent :: Gloss.Event -> World -> World
@@ -39,7 +42,7 @@ handleStep :: Float -> World -> World
 handleStep _ world = world
 
 data World = World
-    {
+    { ballPosition :: (Float, Float)
     } deriving (Eq, Ord, Read, Show)
 
 ballRadius :: Float

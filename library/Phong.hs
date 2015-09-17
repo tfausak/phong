@@ -27,7 +27,10 @@ initialWorld = World
     }
 
 renderWorld :: World -> Gloss.Picture
-renderWorld world = Gloss.Text (show world)
+renderWorld world = Gloss.pictures
+    [ Gloss.text (show world)
+    , Gloss.circle ballRadius
+    ]
 
 handleEvent :: Gloss.Event -> World -> World
 handleEvent _ world = world
@@ -38,3 +41,6 @@ handleStep _ world = world
 data World = World
     {
     } deriving (Eq, Ord, Read, Show)
+
+ballRadius :: Float
+ballRadius = 10.0

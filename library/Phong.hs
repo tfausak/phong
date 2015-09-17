@@ -18,7 +18,7 @@ displayMode :: Gloss.Display
 displayMode = Gloss.FullScreen (worldWidth, worldHeight)
 
 backgroundColor :: Gloss.Color
-backgroundColor = Gloss.makeColor 0.5 0.5 0.5 0.0
+backgroundColor = Gloss.black
 
 stepRate :: Int
 stepRate = 32
@@ -33,6 +33,7 @@ renderWorld :: World -> Gloss.Picture
 renderWorld world = Gloss.pictures
     [ Gloss.circle ballRadius
         |> uncurry Gloss.translate (ballPosition world)
+        |> Gloss.color Gloss.white
     ]
 
 handleEvent :: Gloss.Event -> World -> World

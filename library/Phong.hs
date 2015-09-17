@@ -32,6 +32,8 @@ initialWorld = World
 renderWorld :: World -> Gloss.Picture
 renderWorld world = Gloss.pictures
     [ Gloss.text (show world)
+        |> Gloss.scale 0.2 0.2
+        |> Gloss.translate (-700.0) (-420.0)
     , Gloss.circle ballRadius
         |> uncurry Gloss.translate (ballPosition world)
     ]

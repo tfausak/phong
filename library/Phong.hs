@@ -45,11 +45,17 @@ handleStep :: Float -> World -> World
 handleStep time world =
     let (px, py) = ballPosition world
         (vx, vy) = ballVelocity world
+
         px' = px + time * vx
         py' = py + time * vy
+
+        vx' = if px' >= (720.0 - ballRadius) || px' <= (ballRadius - 720.0)
+            then -vx else vx
+        vy' = if py' >= (450.0 - ballRadius) || py' <= (ballRadius - 450.0)
+            then -vy else vy
     in  world
         { ballPosition = (px', py')
-        , ballVelocity = (vx, vy)
+        , ballVelocity = (vx', vy')
         }
 
 data World = World

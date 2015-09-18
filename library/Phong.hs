@@ -25,8 +25,8 @@ stepRate = 32
 
 initialWorld :: World
 initialWorld = World
-    { ballPosition = (0.0, 0.0)
-    , ballVelocity = (-200.0, -100.0)
+    { ballPosition = (0, 0)
+    , ballVelocity = (-200, -100)
     }
 
 renderWorld :: World -> Gloss.Picture
@@ -34,8 +34,8 @@ renderWorld world = Gloss.pictures
     [ Gloss.circle ballRadius
         |> uncurry Gloss.translate (ballPosition world)
         |> Gloss.color Gloss.white
-    , Gloss.rectangleWire 50.0 200.0
-        |> Gloss.translate (-worldWidth / 2 + 50) 0.0
+    , Gloss.rectangleWire 50 200
+        |> Gloss.translate (-worldWidth / 2 + 50) 0
         |> Gloss.color Gloss.white
     ]
 
@@ -71,4 +71,4 @@ worldHeight :: (Num a) => a
 worldHeight = 900
 
 ballRadius :: Float
-ballRadius = 10.0
+ballRadius = 10

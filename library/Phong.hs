@@ -40,59 +40,67 @@ renderWorld world = Gloss.pictures
     , Gloss.rectangleWire paddleWidth paddleHeight
         |> Gloss.translate (-worldWidth / 2 + paddleWidth / 2) (paddleOffset world)
         |> Gloss.color Gloss.white
+    , case gameStatus world of
+        Playing -> Gloss.blank
+        Finished -> Gloss.text "game over"
+            |> Gloss.color Gloss.red
     ]
 
 handleEvent :: Gloss.Event -> World -> World
-handleEvent event world = case event of
-    Gloss.EventKey (Gloss.SpecialKey Gloss.KeyUp) Gloss.Down _ _ ->
-        world { paddleState = MovingUp }
-    Gloss.EventKey (Gloss.SpecialKey Gloss.KeyUp) Gloss.Up _ _ ->
-        if paddleState world == MovingUp
-        then world { paddleState = Stationary }
-        else world
-    Gloss.EventKey (Gloss.SpecialKey Gloss.KeyDown) Gloss.Down _ _ ->
-        world { paddleState = MovingDown }
-    Gloss.EventKey (Gloss.SpecialKey Gloss.KeyDown) Gloss.Up _ _ ->
-        if paddleState world == MovingDown
-        then world { paddleState = Stationary }
-        else world
-    _ -> world
+handleEvent event world = case gameStatus world of
+    Finished -> world
+    Playing -> case event of
+        Gloss.EventKey (Gloss.SpecialKey Gloss.KeyUp) Gloss.Down _ _ ->
+            world { paddleState = MovingUp }
+        Gloss.EventKey (Gloss.SpecialKey Gloss.KeyUp) Gloss.Up _ _ ->
+            if paddleState world == MovingUp
+            then world { paddleState = Stationary }
+            else world
+        Gloss.EventKey (Gloss.SpecialKey Gloss.KeyDown) Gloss.Down _ _ ->
+            world { paddleState = MovingDown }
+        Gloss.EventKey (Gloss.SpecialKey Gloss.KeyDown) Gloss.Up _ _ ->
+            if paddleState world == MovingDown
+            then world { paddleState = Stationary }
+            else world
+        _ -> world
 
 handleStep :: Float -> World -> World
-handleStep time world =
-    let (px, py) = ballPosition world
-        (vx, vy) = ballVelocity world
+handleStep time world = case gameStatus world of
+    Finished -> world
+    Playing ->
+        let (px, py) = ballPosition world
+            (vx, vy) = ballVelocity world
 
-        px' = px + time * vx
-        py' = py + time * vy
+            px' = px + time * vx
+            py' = py + time * vy
 
-        o = case paddleState world of
-            Stationary -> paddleOffset world
-            MovingUp -> paddleOffset world + time * paddleVelocity
-            MovingDown -> paddleOffset world - time * paddleVelocity
-        o' = clamp o (-worldHeight / 2 + paddleHeight / 2 + 10) (worldHeight / 2 - paddleHeight / 2 - 10)
+            o = case paddleState world of
+                Stationary -> paddleOffset world
+                MovingUp -> paddleOffset world + time * paddleVelocity
+                MovingDown -> paddleOffset world - time * paddleVelocity
+            o' = clamp o (-worldHeight / 2 + paddleHeight / 2 + 10) (worldHeight / 2 - paddleHeight / 2 - 10)
 
-        hitPaddle
-            = py' >= o' - paddleHeight / 2
-            && py' <= o' + paddleHeight / 2
-            && px' <= -worldWidth / 2 + paddleWidth + ballRadius
+            hitPaddle
+                = py' >= o' - paddleHeight / 2
+                && py' <= o' + paddleHeight / 2
+                && px' <= -worldWidth / 2 + paddleWidth + ballRadius
 
-        vx' = if px' >= (worldWidth / 2 - ballRadius) || px' <= (ballRadius - worldWidth / 2) || hitPaddle
-            then -vx else vx
-        vy' = if py' >= (worldHeight / 2 - ballRadius) || py' <= (ballRadius - worldHeight / 2)
-            then -vy else vy
+            vx' = if px' >= (worldWidth / 2 - ballRadius) || px' <= (ballRadius - worldWidth / 2) || hitPaddle
+                then -vx else vx
+            vy' = if py' >= (worldHeight / 2 - ballRadius) || py' <= (ballRadius - worldHeight / 2)
+                then -vy else vy
 
-        s = case gameStatus world of
-            Finished -> Finished
-            Playing -> if px' <= -worldWidth / 2 + ballRadius
-                then Finished
-                else Playing
-    in  world
-        { ballPosition = (px', py')
-        , ballVelocity = (vx', vy')
-        , paddleOffset = o'
-        , gameStatus = s
-        }
+            s = case gameStatus world of
+                Finished -> Finished
+                Playing -> if px' <= -worldWidth / 2 + ballRadius
+                    then Finished
+                    else Playing
+        in  world
+            { ballPosition = (px', py')
+            , ballVelocity = (vx', vy')
+            , paddleOffset = o'
+            , gameStatus = s
+            }
 
 data World = World
     { ballPosition :: (Float, Float)

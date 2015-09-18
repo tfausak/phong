@@ -28,6 +28,7 @@ initialWorld = World
     { ballPosition = (0, 0)
     , ballVelocity = (-200, -100)
     , paddleOffset = 0
+    , paddleState = Stationary
     }
 
 renderWorld :: World -> Gloss.Picture
@@ -43,13 +44,17 @@ renderWorld world = Gloss.pictures
 handleEvent :: Gloss.Event -> World -> World
 handleEvent event world = case event of
     Gloss.EventKey (Gloss.SpecialKey Gloss.KeyUp) Gloss.Down _ _ ->
-        let p = paddleOffset world
-            p' = p + paddleVelocity
-        in  world { paddleOffset = p' }
+        world { paddleState = MovingUp }
+    Gloss.EventKey (Gloss.SpecialKey Gloss.KeyUp) Gloss.Up _ _ ->
+        if paddleState world == MovingUp
+        then world { paddleState = Stationary }
+        else world
     Gloss.EventKey (Gloss.SpecialKey Gloss.KeyDown) Gloss.Down _ _ ->
-        let p = paddleOffset world
-            p' = p - paddleVelocity
-        in  world { paddleOffset = p' }
+        world { paddleState = MovingDown }
+    Gloss.EventKey (Gloss.SpecialKey Gloss.KeyDown) Gloss.Up _ _ ->
+        if paddleState world == MovingDown
+        then world { paddleState = Stationary }
+        else world
     _ -> world
 
 handleStep :: Float -> World -> World
@@ -64,16 +69,30 @@ handleStep time world =
             then -vx else vx
         vy' = if py' >= (worldHeight / 2 - ballRadius) || py' <= (ballRadius - worldHeight / 2)
             then -vy else vy
+
+        o = paddleOffset world
+        o' = case paddleState world of
+            Stationary -> o
+            MovingUp -> o + time * paddleVelocity
+            MovingDown -> o - time * paddleVelocity
     in  world
         { ballPosition = (px', py')
         , ballVelocity = (vx', vy')
+        , paddleOffset = o'
         }
 
 data World = World
     { ballPosition :: (Float, Float)
     , ballVelocity :: (Float, Float)
     , paddleOffset :: Float
+    , paddleState :: PaddleState
     } deriving (Eq, Ord, Read, Show)
+
+data PaddleState
+    = Stationary
+    | MovingUp
+    | MovingDown
+    deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 worldWidth :: (Num a) => a
 worldWidth = 1440
@@ -91,4 +110,4 @@ paddleHeight :: Float
 paddleHeight = 200
 
 paddleVelocity :: Float
-paddleVelocity = 50
+paddleVelocity = 200

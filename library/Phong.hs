@@ -29,6 +29,7 @@ initialWorld = World
     , ballVelocity = (-200, -100)
     , paddleOffset = 0
     , paddleState = Stationary
+    , gameStatus = Playing
     }
 
 renderWorld :: World -> Gloss.Picture
@@ -80,10 +81,17 @@ handleStep time world =
             then -vx else vx
         vy' = if py' >= (worldHeight / 2 - ballRadius) || py' <= (ballRadius - worldHeight / 2)
             then -vy else vy
+
+        s = case gameStatus world of
+            Finished -> Finished
+            Playing -> if px' <= -worldWidth / 2 + ballRadius
+                then Finished
+                else Playing
     in  world
         { ballPosition = (px', py')
         , ballVelocity = (vx', vy')
         , paddleOffset = o'
+        , gameStatus = s
         }
 
 data World = World
@@ -91,12 +99,18 @@ data World = World
     , ballVelocity :: (Float, Float)
     , paddleOffset :: Float
     , paddleState :: PaddleState
+    , gameStatus :: GameStatus
     } deriving (Eq, Ord, Read, Show)
 
 data PaddleState
     = Stationary
     | MovingUp
     | MovingDown
+    deriving (Bounded, Enum, Eq, Ord, Read, Show)
+
+data GameStatus
+    = Playing
+    | Finished
     deriving (Bounded, Enum, Eq, Ord, Read, Show)
 
 worldWidth :: (Num a) => a

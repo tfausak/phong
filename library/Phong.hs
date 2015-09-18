@@ -37,7 +37,7 @@ renderWorld world = Gloss.pictures
         |> uncurry Gloss.translate (ballPosition world)
         |> Gloss.color Gloss.white
     , Gloss.rectangleWire paddleWidth paddleHeight
-        |> Gloss.translate (-worldWidth / 2 + paddleWidth) (paddleOffset world)
+        |> Gloss.translate (-worldWidth / 2 + paddleWidth / 2) (paddleOffset world)
         |> Gloss.color Gloss.white
     ]
 
@@ -65,16 +65,21 @@ handleStep time world =
         px' = px + time * vx
         py' = py + time * vy
 
-        vx' = if px' >= (worldWidth / 2 - ballRadius) || px' <= (ballRadius - worldWidth / 2)
-            then -vx else vx
-        vy' = if py' >= (worldHeight / 2 - ballRadius) || py' <= (ballRadius - worldHeight / 2)
-            then -vy else vy
-
         o = case paddleState world of
             Stationary -> paddleOffset world
             MovingUp -> paddleOffset world + time * paddleVelocity
             MovingDown -> paddleOffset world - time * paddleVelocity
         o' = clamp o (-worldHeight / 2 + paddleHeight / 2 + 10) (worldHeight / 2 - paddleHeight / 2 - 10)
+
+        hitPaddle
+            = py' >= o' - paddleHeight / 2
+            && py' <= o' + paddleHeight / 2
+            && px' <= -worldWidth / 2 + paddleWidth + ballRadius
+
+        vx' = if px' >= (worldWidth / 2 - ballRadius) || px' <= (ballRadius - worldWidth / 2) || hitPaddle
+            then -vx else vx
+        vy' = if py' >= (worldHeight / 2 - ballRadius) || py' <= (ballRadius - worldHeight / 2)
+            then -vy else vy
     in  world
         { ballPosition = (px', py')
         , ballVelocity = (vx', vy')

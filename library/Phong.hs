@@ -35,8 +35,8 @@ renderWorld world = Gloss.pictures
     [ Gloss.circle ballRadius
         |> uncurry Gloss.translate (ballPosition world)
         |> Gloss.color Gloss.white
-    , Gloss.rectangleWire 50 200
-        |> Gloss.translate (-worldWidth / 2 + 50) (paddleOffset world)
+    , Gloss.rectangleWire paddleWidth paddleHeight
+        |> Gloss.translate (-worldWidth / 2 + paddleWidth) (paddleOffset world)
         |> Gloss.color Gloss.white
     ]
 
@@ -44,11 +44,11 @@ handleEvent :: Gloss.Event -> World -> World
 handleEvent event world = case event of
     Gloss.EventKey (Gloss.SpecialKey Gloss.KeyUp) Gloss.Down _ _ ->
         let p = paddleOffset world
-            p' = p + 50
+            p' = p + paddleVelocity
         in  world { paddleOffset = p' }
     Gloss.EventKey (Gloss.SpecialKey Gloss.KeyDown) Gloss.Down _ _ ->
         let p = paddleOffset world
-            p' = p - 50
+            p' = p - paddleVelocity
         in  world { paddleOffset = p' }
     _ -> world
 
@@ -83,3 +83,12 @@ worldHeight = 900
 
 ballRadius :: Float
 ballRadius = 10
+
+paddleWidth :: Float
+paddleWidth = 50
+
+paddleHeight :: Float
+paddleHeight = 200
+
+paddleVelocity :: Float
+paddleVelocity = 50

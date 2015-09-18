@@ -34,6 +34,9 @@ renderWorld world = Gloss.pictures
     [ Gloss.circle ballRadius
         |> uncurry Gloss.translate (ballPosition world)
         |> Gloss.color Gloss.white
+    , Gloss.rectangleWire 50.0 200.0
+        |> Gloss.translate (-worldWidth / 2 + 50) 0.0
+        |> Gloss.color Gloss.white
     ]
 
 handleEvent :: Gloss.Event -> World -> World

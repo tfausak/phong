@@ -27,6 +27,7 @@ initialWorld :: World
 initialWorld = World
     { ballPosition = (0, 0)
     , ballVelocity = (-200, -100)
+    , paddleOffset = 0
     }
 
 renderWorld :: World -> Gloss.Picture
@@ -35,16 +36,20 @@ renderWorld world = Gloss.pictures
         |> uncurry Gloss.translate (ballPosition world)
         |> Gloss.color Gloss.white
     , Gloss.rectangleWire 50 200
-        |> Gloss.translate (-worldWidth / 2 + 50) 0
+        |> Gloss.translate (-worldWidth / 2 + 50) (paddleOffset world)
         |> Gloss.color Gloss.white
     ]
 
 handleEvent :: Gloss.Event -> World -> World
 handleEvent event world = case event of
-    -- TODO: Move paddle down.
-    Gloss.EventKey (Gloss.SpecialKey Gloss.KeyUp) Gloss.Down _ _ -> world
-    -- TODO: Move paddle up.
-    Gloss.EventKey (Gloss.SpecialKey Gloss.KeyDown) Gloss.Down _ _ -> world
+    Gloss.EventKey (Gloss.SpecialKey Gloss.KeyUp) Gloss.Down _ _ ->
+        let p = paddleOffset world
+            p' = p + 50
+        in  world { paddleOffset = p' }
+    Gloss.EventKey (Gloss.SpecialKey Gloss.KeyDown) Gloss.Down _ _ ->
+        let p = paddleOffset world
+            p' = p - 50
+        in  world { paddleOffset = p' }
     _ -> world
 
 handleStep :: Float -> World -> World
@@ -67,6 +72,7 @@ handleStep time world =
 data World = World
     { ballPosition :: (Float, Float)
     , ballVelocity :: (Float, Float)
+    , paddleOffset :: Float
     } deriving (Eq, Ord, Read, Show)
 
 worldWidth :: (Num a) => a

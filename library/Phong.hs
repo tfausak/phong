@@ -40,7 +40,12 @@ renderWorld world = Gloss.pictures
     ]
 
 handleEvent :: Gloss.Event -> World -> World
-handleEvent _ world = world
+handleEvent event world = case event of
+    -- TODO: Move paddle down.
+    Gloss.EventKey (Gloss.SpecialKey Gloss.KeyUp) Gloss.Down _ _ -> world
+    -- TODO: Move paddle up.
+    Gloss.EventKey (Gloss.SpecialKey Gloss.KeyDown) Gloss.Down _ _ -> world
+    _ -> world
 
 handleStep :: Float -> World -> World
 handleStep time world =

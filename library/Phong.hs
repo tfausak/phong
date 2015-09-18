@@ -70,11 +70,11 @@ handleStep time world =
         vy' = if py' >= (worldHeight / 2 - ballRadius) || py' <= (ballRadius - worldHeight / 2)
             then -vy else vy
 
-        o = paddleOffset world
-        o' = case paddleState world of
-            Stationary -> o
-            MovingUp -> o + time * paddleVelocity
-            MovingDown -> o - time * paddleVelocity
+        o = case paddleState world of
+            Stationary -> paddleOffset world
+            MovingUp -> paddleOffset world + time * paddleVelocity
+            MovingDown -> paddleOffset world - time * paddleVelocity
+        o' = clamp o (-worldHeight / 2 + paddleHeight / 2 + 10) (worldHeight / 2 - paddleHeight / 2 - 10)
     in  world
         { ballPosition = (px', py')
         , ballVelocity = (vx', vy')
@@ -111,3 +111,6 @@ paddleHeight = 200
 
 paddleVelocity :: Float
 paddleVelocity = 200
+
+clamp :: (Ord a) => a -> a -> a -> a
+clamp x l h = max l (min h x)
